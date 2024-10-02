@@ -1,2 +1,2 @@
 # machine-learning-project
- machine learning study
+ 机器学习项目（sklearn实现+numpy实现）

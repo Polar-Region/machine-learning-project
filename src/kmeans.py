@@ -19,10 +19,10 @@ def distance(x, y):
     z = np.sqrt(np.sum(z, axis=2))
     return z
 
-class KMeansDataCluster:
-    def __init__(self, k=2):
+class BaseKMeansDataCluster:
+    def __init__(self, data, k=2):
         """初始化数据和聚类数量。"""
-        self.data = np.array([[1, 0], [1, 2], [1, 4], [4, 4], [4, 2], [4, 0]])
+        self.data = data
         self.K = k
         self.labels = None
         self.centroids = None
@@ -43,18 +43,17 @@ class KMeansDataCluster:
     def sklearn_kmeans(self):
         """执行 K-Means 聚类并可视化结果。"""
         self.validate_k()
-
         kmeans = KMeans(n_clusters=self.K, random_state=0)
         kmeans.fit(self.data)
-        self.labels = kmeans.labels_  # 存储聚类标签到实例变量
-        self.centroids = kmeans.cluster_centers_  # 存储聚类中心到实例变量
+        self.labels = kmeans.labels_
+        self.centroids = kmeans.cluster_centers_
 
         print("聚类中心：")
         print(self.centroids)
         print("聚类标签：")
         print(self.labels)
         self.show_plots()
-        return self.centroids, self.labels  # 返回最终的聚类中心和标签
+        return self.centroids, self.labels
 
     def numpy_kmeans(self, max_iter=30):
         """执行 K-Means 聚类，使用 NumPy 实现。"""
@@ -62,7 +61,6 @@ class KMeansDataCluster:
         data = np.asarray(self.data, dtype=np.float32)
         n_samples, n_features = data.shape
 
-        # 随机初始化簇中心
         indices = random.sample(range(n_samples), self.K)
         self.centroids = np.copy(data[indices])
         self.labels = np.zeros(data.shape[0], dtype=np.int32)
@@ -83,22 +81,23 @@ class KMeansDataCluster:
         print("聚类标签：")
         print(self.labels)
         self.show_plots()
-        return self.centroids, self.labels  # 返回最终的聚类中心和标签
+        return self.centroids, self.labels
 
-
-class RandomKMeansDataCluster:
+class KMeansDataCluster(BaseKMeansDataCluster):
     def __init__(self, k=2):
-        """初始化数据和聚类数量。"""
-        self.data = np.array([[1, 0], [1, 2], [1, 4], [4, 4], [4, 2], [4, 0]])
-        self.K = k
-        self.labels = None
-        self.centroids = None
+        data = np.array([[1, 0], [1, 2], [1, 4], [4, 4], [4, 2], [4, 0]])
+        super().__init__(data, k)
 
-    def validate_k(self):
-        if self.K > len(self.data):
-            raise ValueError("聚类数量必须小于或等于数据点数量。")
+class RandomKMeansDataCluster(BaseKMeansDataCluster):
+    def __init__(self, k=2, n_points=8, low=0, high=10):
+        data = np.random.uniform(low, high, size=(n_points, 2))
+        super().__init__(data, k)
 
 if __name__ == "__main__":
     kmeansData = KMeansDataCluster()
     kmeansData.sklearn_kmeans()
     kmeansData.numpy_kmeans()
+
+    randomKMeansData = RandomKMeansDataCluster()
+    randomKMeansData.sklearn_kmeans()
+    randomKMeansData.numpy_kmeans()
