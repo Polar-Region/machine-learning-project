@@ -16,49 +16,52 @@ from sklearn.neighbors import KNeighborsClassifier
 
 
 class KNNClassifier:
-    def __init__(self, use_sklearn =True, k=3):
+    def __init__(self, use_sklearn =True, k=3, dataset='iris'):
+        self.y_train = None
+        self.X_train = None
         self.use_sklearn = use_sklearn
         self.k = k
+        self.dataset = dataset
         if use_sklearn:
             self.model = KNeighborsClassifier(n_neighbors=k)
 
-    def load_dataset(self, name):
+    def load_dataset(self):
         """加载数据集"""
-        if name == 'iris':
+        if self.dataset == 'iris':
             data = load_iris()
-        elif name == 'wine':
+        elif self.dataset == 'wine':
             data = load_wine()
         else:
             raise ValueError("Unsupported dataset. Choose 'iris' or 'wine'.")
         return data['data'], data['target']
 
-    def fit(self, X, y):
+    def fit(self, X_train, y_train):
         """根据选择使用 sklearn 或 numpy 实现 KNN"""
         if self.use_sklearn:
-            self.model.fit(X, y)
+            self.model.fit(X_train, y_train)
         else:
-            self.X_train = X
-            self.y_train = y
+            self.X_train = X_train
+            self.y_train = y_train
 
-    def predict(self, X):
+    def predict(self, X_test):
         """根据选择使用 sklearn 或 numpy 进行预测"""
         if self.use_sklearn:
-            return self.model.predict(X)
+            return self.model.predict(X_test)
         else:
-            return self.knn_numpy(self.X_train, self.y_train, X, self.k)
+            return self.knn_numpy(X_test)
 
-    def knn_numpy(self, X_train, y_train, X_test, k):
+    def knn_numpy(self,X_test):
         """手动实现的 KNN 使用 numpy"""
-        distances = np.sqrt(((X_train - X_test[:, np.newaxis]) ** 2).sum(axis=2))
-        nearest_neighbors = np.argsort(distances, axis=1)[:, :k]
-        top_k_labels = y_train[nearest_neighbors]
+        distances = np.sqrt(((self.X_train - X_test[:, np.newaxis]) ** 2).sum(axis=2))
+        nearest_neighbors = np.argsort(distances, axis=1)[:, :self.k]
+        top_k_labels = self.y_train[nearest_neighbors]
         return mode(top_k_labels, axis=1)[0]
 
 
 if __name__ == "__main__":
     # 示例使用
-    knn = KNNClassifier(use_sklearn=False)  # 设置为 numpy 实现
-    X, y = knn.load_dataset('iris')
+    knn = KNNClassifier(use_sklearn=False, dataset='iris')  # 设置为 numpy 实现
+    X, y = knn.load_dataset()
     knn.fit(X, y)
     predictions = knn.predict(X[:10])
     print(predictions)

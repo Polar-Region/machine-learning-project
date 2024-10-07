@@ -4,3 +4,4 @@ __version__ = "0.1.0"
 __author__ = "Lee"
 
 from .kmeans import KMeansDataCluster
+from .knn import KNNClassifier
