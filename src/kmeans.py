@@ -1,13 +1,13 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+    #!/usr/bin/env python3
+    # -*- coding: utf-8 -*-
 
-"""
-模块名称: kmeans
-描述: kmeans的功能实现
-作者: Lee
-日期: 2024/10/2
-版本: 1.1
-"""
+    """
+    模块名称: kmeans
+    描述: kmeans的功能实现
+    作者: Lee
+    日期: 2024/10/2
+    版本: 1.1
+    """
 import random
 from sklearn.cluster import KMeans
 import numpy as np
